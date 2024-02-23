@@ -1,0 +1,10 @@
+name: "@danielgural/optimal_confidence_threshold"
+description: Find Your Optimal Confidence Threshold
+version: 1.0.0
+fiftyone:
+  version: "*"
+url: https://github.com/danielgural/optimal_confidence_threshold/blob/main/README.md
+license: Apache 2.0
+operators:
+  - optimal_conf_threshold
+
