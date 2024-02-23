@@ -4,7 +4,7 @@
 
 This plugin is a Python plugin that allows for you to find the optimal confidence threshold for deploying your models!
 
-🔎 Find tthe magic number in one click!
+🔎 Find the magic number in one click!
 
 ## Installation
 
@@ -16,7 +16,7 @@ fiftyone plugins download https://github.com/danielgural/optimal_confidence_thre
 
 ### `optimal_conf_threshold`
 
-Finding the optimal confidence threshold can always be tricky. One way to consider doing so is finding the number that maximizes your F1 score. This plugin implements a method of running an optimized version of FiftyOne's `evaluate_detections ` [function](https://docs.voxel51.com/api/fiftyone.core.dataset.html?highlight=evaluate%20detections#fiftyone.core.dataset.Dataset.evaluate_detections). This will calculate the F1 score at different thresholds until the best one is found! Here is how it works
+Finding the optimal confidence threshold can always be tricky. One way to consider doing so is finding the number that maximizes your F1 score. This plugin implements a method of running an optimized version of FiftyOne's `evaluate_detections` [method](https://docs.voxel51.com/api/fiftyone.core.dataset.html?highlight=evaluate%20detections#fiftyone.core.dataset.Dataset.evaluate_detections). This will calculate the F1 score at different thresholds until the best one is found! Here is how it works!
 
 ![Confidence Inputs](https://github.com/danielgural/optimal_confidence_threshold/blob/main/assets/conf_inputs.png)
 
