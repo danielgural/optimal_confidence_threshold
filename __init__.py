@@ -13,6 +13,8 @@ import fiftyone.core.utils as fou
 import numpy as np
 import fiftyone.zoo as foz
 
+import scipy
+
 
 
 
@@ -74,12 +76,6 @@ def _opt_conf_thresh_inputs(ctx, inputs):
             view=types.FieldView(componentsProps={'field': {'min': 0.0001, "max": 0.9999, "step": 0.01, "default": 0.01}}),
             )
 
-    inputs.int(
-            "num_thresholds",
-            label="How many thresholds would you like to check",
-            description="Determines the number of thresholds to check, increasing the number increases complexity of the run on O(n)",
-            view=types.FieldView(),
-            )
     
     labels = []
     field_names = list(target_view.get_field_schema().keys())
@@ -135,33 +131,38 @@ def _opt_conf_thresh_inputs(ctx, inputs):
 def _opt_conf_thresh(ctx):
     lb = ctx.params.get("lower_bound")
     ub = ctx.params.get("upper_bound")
-    num_thresholds = ctx.params.get("num_thresholds")
    
     best_f1 = -1
     best_threshold = None
     gt =   ctx.params.get("label_ground_truth")
     pred =  ctx.params.get("label_predictions")
-    for conf in np.linspace(lb, ub, num=num_thresholds).tolist():
+    res = scipy.optimize.fminbound(
+                    func=calculate_f1,
+                    x1=lb,
+                    x2=ub,
+                    args=(ctx,pred,gt),
+                    xtol=0.01,
+                    full_output=True
+    )
 
-        conf_view = ctx.dataset.filter_labels(pred, F("confidence") >= conf)
-        results = conf_view.evaluate_detections(pred,
-            gt_field=gt,
-            eval_key="eval",
-            missing="fn")
-
-        fp = sum(conf_view.values("eval_fp"))
-        tp = sum(conf_view.values("eval_tp"))
-        fn = sum(conf_view.values("eval_fn"))
-
-        f1 = tp/(tp+0.5*(fp+fn))
-        print(f1)
-        if f1 > best_f1:
-                best_f1 = f1
-                best_threshold = conf
-
-    return best_f1, best_threshold
+    best_conf, f1val, ierr, numfunc = res
+    return -1.0*f1val, best_conf
 
 
+def calculate_f1(conf, ctx, pred, gt):
+    conf_view = ctx.dataset.filter_labels(pred, F("confidence") >= conf)
+    results = conf_view.evaluate_detections(pred,
+        gt_field=gt,
+        eval_key="eval",
+        missing="fn")
+
+    fp = sum(conf_view.values("eval_fp"))
+    tp = sum(conf_view.values("eval_tp"))
+    fn = sum(conf_view.values("eval_fn"))
+
+    f1 = tp/(tp+0.5*(fp+fn))
+
+    return -1.0*f1
 
 def _execution_mode(ctx, inputs):
     delegate = ctx.params.get("delegate", False)
